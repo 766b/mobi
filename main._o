@@ -1,0 +1,98 @@
+package mobi
+
+import (
+	"image"
+	"image/jpeg"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/nfnt/resize"
+)
+
+func main() {
+	m, _ := LoadImage("http://cdn.ttgtmedia.com/rms/microscope/blogs/network_noise/2011/02/10/18130-Google.jpg")
+	m.toResizedJPG("data/resized.jpg", 90, 150, 150)
+	writer()
+}
+
+func writer() {
+	m, err := NewWriter("output.mobi")
+	if err != nil {
+		log.Fatal(err)
+	}
+	m.Title("Book Title")
+	m.Compression(CompressionNone)
+
+	m.AddCover("data/cover.jpg", "data/thumbnail.jpg")
+
+	m.NewChapter("Chapter 1", []byte("Some text here")).AddSubChapter("Chapter 1-1", []byte("Some text here"))
+	m.NewChapter("Chapter 2", []byte("Some text here")).AddSubChapter("Chapter 2-1", []byte("Some text here"))
+	m.NewChapter("Chapter 3", []byte("Some text here")).AddSubChapter("Chapter 3-1", []byte("Some text here"))
+	m.NewChapter("Chapter 4", []byte("Some text here")).AddSubChapter("Chapter 4-1", []byte("Some text here"))
+	m.Write()
+}
+func reader() {
+	mobi, err := NewReader("./sample/Beyond-Good-and-Evil-Galbraithcolor.mobi")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	PrintStruct(mobi.Pdf)
+	PrintStruct(mobi.Pdh)
+}
+
+type ImageConverer struct {
+	Url string
+	Raw image.Image
+	Out image.Image
+
+	writeOut bool
+}
+
+func LoadImage(url string) (*ImageConverer, error) {
+	ic := ImageConverer{}
+	ic.Url = url
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return &ic, err
+	}
+	defer resp.Body.Close()
+
+	ic.Raw, _, err = image.Decode(resp.Body)
+	if err != nil {
+		return &ic, err
+	}
+	return &ic, nil
+}
+
+func (i *ImageConverer) toJPG(path string, quality int) error {
+
+	w, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer w.Close()
+
+	if i.writeOut {
+		err = jpeg.Encode(w, i.Out, &jpeg.Options{Quality: quality})
+		i.writeOut = false
+	} else {
+		err = jpeg.Encode(w, i.Raw, &jpeg.Options{Quality: quality})
+	}
+
+	if err != nil {
+		w.Close()
+		os.Remove(path)
+		return err
+	}
+
+	return nil
+}
+
+func (i *ImageConverer) toResizedJPG(path string, quality int, width, height uint) error {
+	i.Out = resize.Resize(width, height, i.Raw, resize.Lanczos3)
+	i.writeOut = true
+	return i.toJPG(path, quality)
+}
