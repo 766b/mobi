@@ -14,13 +14,13 @@ type mobiChapter struct {
 }
 
 func (w *MobiWriter) NewChapter(title string, text []byte) *mobiChapter {
-	w.chapters = append(w.chapters, mobiChapter{Id: w.chapterCount, Title: title, Html: MinimizeHTML(text)})
+	w.chapters = append(w.chapters, mobiChapter{Id: w.chapterCount, Title: title, Html: minimizeHTML(text)})
 	w.chapterCount++
 	return &w.chapters[len(w.chapters)-1]
 }
 
 func (w *mobiChapter) AddSubChapter(title string, text []byte) *mobiChapter {
-	w.SubChapters = append(w.SubChapters, &mobiChapter{Parent: w.Id, Title: title, Html: MinimizeHTML(text)})
+	w.SubChapters = append(w.SubChapters, &mobiChapter{Parent: w.Id, Title: title, Html: minimizeHTML(text)})
 	return w
 }
 

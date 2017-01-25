@@ -18,7 +18,7 @@ const (
 	TagEntry_ImgAttrOffset            = 73 // Image attribution offset in cncx
 )
 
-var TagEntryMap = map[uint8]string{
+var tagEntryMap = map[uint8]string{
 	TagEntry_Pos:                "Offset",
 	TagEntry_Len:                "Lenght",
 	TagEntry_NameOffset:         "Label",

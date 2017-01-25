@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func PrintStruct(x interface{}) {
+func printStruct(x interface{}) {
 	ref := reflect.ValueOf(x)
 
 	if ref.Kind() == reflect.Ptr {
@@ -65,7 +65,7 @@ func hasBit(n int, pos uint) bool {
 	return (val > 0)
 }
 
-func GetExthMetaByTag(tag uint32) mobiExthMeta {
+func getExthMetaByTag(tag uint32) mobiExthMeta {
 	for i := 0; i < len(ExthMeta); i++ {
 		if ExthMeta[i].ID == tag {
 			return ExthMeta[i]
@@ -94,7 +94,7 @@ var setBits [256]uint8 = [256]uint8{
 }
 
 // VwiDec decoders variable lenght integer. Returns value and number of bytes consumed
-func VwiDec(src []uint8, forward bool) (uint32, uint32) {
+func vwiDec(src []uint8, forward bool) (uint32, uint32) {
 	var val uint32 = 0 //val = 0
 	var byts []uint8   // byts = bytearray()
 
@@ -125,7 +125,7 @@ func VwiDec(src []uint8, forward bool) (uint32, uint32) {
 	return val, uint32(len(byts))
 }
 
-func VwiEncInt(x int) []uint8 {
+func vwiEncInt(x int) []uint8 {
 	buf := make([]uint8, 64)
 	z := 0
 	for {
@@ -143,7 +143,7 @@ func VwiEncInt(x int) []uint8 {
 	return buf[:z]
 }
 
-func MinimizeHTML(x []byte) []byte { //, int
+func minimizeHTML(x []byte) []byte { //, int
 	//Clear multiple spaces
 	out := regexp.MustCompile("[ ]+").ReplaceAllString(string(x), " ")
 	out = regexp.MustCompile("[\t\r\n]").ReplaceAllString(out, "")
@@ -153,7 +153,7 @@ func MinimizeHTML(x []byte) []byte { //, int
 
 var mask_to_bit_shifts = map[int]uint8{1: 0, 2: 1, 3: 0, 4: 2, 8: 3, 12: 2, 16: 4, 32: 5, 48: 4, 64: 6, 128: 7, 192: 6}
 
-func ControlByte(tagx []mobiTagxTags) []byte {
+func controlByte(tagx []mobiTagxTags) []byte {
 	var cbs []byte
 	var ans uint8 = 0
 	for _, tags := range tagx {
@@ -170,7 +170,7 @@ func ControlByte(tagx []mobiTagxTags) []byte {
 	return cbs
 }
 
-func StringToBytes(value string, output interface{}) {
+func stringToBytes(value string, output interface{}) {
 	out := reflect.ValueOf(output).Elem()
 
 	for i := 0; i < out.Type().Len(); i++ {
@@ -181,7 +181,7 @@ func StringToBytes(value string, output interface{}) {
 	}
 }
 
-func UnderlineTitle(x string) string {
+func underlineTitle(x string) string {
 	x = regexp.MustCompile("[^-A-Za-z0-9]").ReplaceAllString(x, "_")
 	if len(x) > 31 {
 		return x[:31]
@@ -189,7 +189,7 @@ func UnderlineTitle(x string) string {
 	return x
 }
 
-func PalmDocLZ77Pack(data []byte) []byte {
+func palmDocLZ77Pack(data []byte) []byte {
 	var outB []byte
 
 	var tailLen = int(data[len(data)-1])

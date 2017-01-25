@@ -156,7 +156,7 @@ func (r *MobiReader) parseIndexRecord(n uint32) error {
 
 			binary.Read(r.file, binary.BigEndian, &r.Cncx.NCX_Count)
 
-			PrintStruct(r.Cncx)
+			// PrintStruct(r.Cncx)
 		}
 	}
 
@@ -267,7 +267,7 @@ func (r *MobiReader) ExthParse() error {
 
 		r.Exth.Records[i].Value = make([]uint8, r.Exth.Records[i].RecordLength-8)
 
-		Tag := GetExthMetaByTag(r.Exth.Records[i].RecordType)
+		Tag := getExthMetaByTag(r.Exth.Records[i].RecordType)
 		switch Tag.Type {
 		case EXTH_TYPE_BINARY:
 			binary.Read(r.file, binary.BigEndian, &r.Exth.Records[i].Value)
@@ -328,7 +328,7 @@ func (r *MobiReader) parseTagx() error {
 	}
 
 	fmt.Println("TagX called")
-	PrintStruct(r.Tagx)
+	// PrintStruct(r.Tagx)
 
 	return nil
 }
@@ -351,7 +351,7 @@ func (r *MobiReader) parseIdxt(IdxtCount uint32) error {
 	//Skip two bytes? Or skip necessary amount to reach total lenght in multiples of 4?
 	r.file.Seek(2, 1)
 
-	PrintStruct(r.Idxt)
+	// PrintStruct(r.Idxt)
 	return nil
 }
 
@@ -382,7 +382,7 @@ func (r *MobiReader) parsePtagx(data []byte) {
 					// the value count!) which will contain the corresponding
 					// variable width values.
 					var consumed uint32
-					value_bytes, consumed = VwiDec(data, true)
+					value_bytes, consumed = vwiDec(data, true)
 					//fmt.Printf("\nConsumed %v", consumed)
 					data = data[consumed:]
 				} else {
@@ -419,19 +419,19 @@ func (r *MobiReader) parsePtagx(data []byte) {
 			// Read value_count * values_per_entry variable width values.
 			fmt.Printf("\nDec: ")
 			for i := 0; i < int(x.Value_Count)*int(x.Tag_Value_Count); i++ {
-				byts, consumed := VwiDec(data, true)
+				byts, consumed := vwiDec(data, true)
 				data = data[consumed:]
 
 				values = append(values, byts)
 				IndxEntry = append(IndxEntry, mobiIndxEntry{x.Tag, byts})
-				fmt.Printf("%v %s: %v ", iz, TagEntryMap[x.Tag], byts)
+				fmt.Printf("%v %s: %v ", iz, tagEntryMap[x.Tag], byts)
 			}
 		} else {
 			// Convert value_bytes to variable width values.
 			total_consumed := 0
 			for {
 				if total_consumed < int(x.Value_Bytes) {
-					byts, consumed := VwiDec(data, true)
+					byts, consumed := vwiDec(data, true)
 					data = data[consumed:]
 
 					total_consumed += int(consumed)

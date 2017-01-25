@@ -129,7 +129,7 @@ func (w *MobiWriter) Write() {
 		}
 
 		if w.compression == CompressionPalmDoc {
-			RecN = PalmDocLZ77Pack(RecN)
+			RecN = palmDocLZ77Pack(RecN)
 		}
 
 		return RecN
@@ -280,15 +280,15 @@ func (w *MobiWriter) generateCNCX() {
 
 			w.cncxBuffer.WriteByte(byte(len(CNCX_ID)))             // Len of ID
 			w.cncxBuffer.WriteString(CNCX_ID)                      // ID
-			w.cncxBuffer.WriteByte(ControlByte(TagxParent)[0])     // Controll Byte
-			w.cncxBuffer.Write(VwiEncInt(node.RecordOffset))       // Record offset
-			w.cncxBuffer.Write(VwiEncInt(node.Len))                // Lenght of a record
-			w.cncxBuffer.Write(VwiEncInt(w.cncxLabelBuffer.Len())) // Label Offset // Offset relative to CNXC record
-			w.cncxLabelBuffer.Write(VwiEncInt(len(node.Title)))    // CNCXLabel lenght
+			w.cncxBuffer.WriteByte(controlByte(TagxParent)[0])     // Controll Byte
+			w.cncxBuffer.Write(vwiEncInt(node.RecordOffset))       // Record offset
+			w.cncxBuffer.Write(vwiEncInt(node.Len))                // Lenght of a record
+			w.cncxBuffer.Write(vwiEncInt(w.cncxLabelBuffer.Len())) // Label Offset // Offset relative to CNXC record
+			w.cncxLabelBuffer.Write(vwiEncInt(len(node.Title)))    // CNCXLabel lenght
 			w.cncxLabelBuffer.WriteString(node.Title)              // CNCXLabel title
-			w.cncxBuffer.Write(VwiEncInt(0))                       // Depth
-			w.cncxBuffer.Write(VwiEncInt(ch1))                     // Child1
-			w.cncxBuffer.Write(VwiEncInt(chN))                     // ChildN
+			w.cncxBuffer.Write(vwiEncInt(0))                       // Depth
+			w.cncxBuffer.Write(vwiEncInt(ch1))                     // Child1
+			w.cncxBuffer.Write(vwiEncInt(chN))                     // ChildN
 			w.chapterCount++
 		} else {
 			CNCX_ID := fmt.Sprintf("%03v", w.chapterCount)
@@ -297,14 +297,14 @@ func (w *MobiWriter) generateCNCX() {
 
 			w.cncxBuffer.WriteByte(byte(len(CNCX_ID)))         // Len of ID
 			w.cncxBuffer.WriteString(CNCX_ID)                  // ID
-			w.cncxBuffer.WriteByte(ControlByte(TagxSingle)[0]) // Controll Byte
-			w.cncxBuffer.Write(VwiEncInt(node.RecordOffset))   // Record offset
+			w.cncxBuffer.WriteByte(controlByte(TagxSingle)[0]) // Controll Byte
+			w.cncxBuffer.Write(vwiEncInt(node.RecordOffset))   // Record offset
 			fmt.Printf("Offset: %v", node.RecordOffset)
-			w.cncxBuffer.Write(VwiEncInt(node.Len))                // Lenght of a record
-			w.cncxBuffer.Write(VwiEncInt(w.cncxLabelBuffer.Len())) // Label Offset 	// Offset relative to CNXC record
-			w.cncxLabelBuffer.Write(VwiEncInt(len(node.Title)))    // CNCXLabel lenght
+			w.cncxBuffer.Write(vwiEncInt(node.Len))                // Lenght of a record
+			w.cncxBuffer.Write(vwiEncInt(w.cncxLabelBuffer.Len())) // Label Offset 	// Offset relative to CNXC record
+			w.cncxLabelBuffer.Write(vwiEncInt(len(node.Title)))    // CNCXLabel lenght
 			w.cncxLabelBuffer.WriteString(node.Title)              // CNCXLabel title
-			w.cncxBuffer.Write(VwiEncInt(0))                       // Depth
+			w.cncxBuffer.Write(vwiEncInt(0))                       // Depth
 			w.chapterCount++
 		}
 
@@ -320,14 +320,14 @@ func (w *MobiWriter) generateCNCX() {
 
 			w.cncxBuffer.WriteByte(byte(len(CNCX_ID)))             // Len of ID
 			w.cncxBuffer.WriteString(CNCX_ID)                      // ID
-			w.cncxBuffer.WriteByte(ControlByte(TagxChild)[0])      // Controll Byte
-			w.cncxBuffer.Write(VwiEncInt(child.RecordOffset))      // Record offset
-			w.cncxBuffer.Write(VwiEncInt(child.Len))               // Lenght of a record
-			w.cncxBuffer.Write(VwiEncInt(w.cncxLabelBuffer.Len())) // Label Offset //Offset relative to CNXC record
-			w.cncxLabelBuffer.Write(VwiEncInt(len(child.Title)))   // CNCXLabel lenght
+			w.cncxBuffer.WriteByte(controlByte(TagxChild)[0])      // Controll Byte
+			w.cncxBuffer.Write(vwiEncInt(child.RecordOffset))      // Record offset
+			w.cncxBuffer.Write(vwiEncInt(child.Len))               // Lenght of a record
+			w.cncxBuffer.Write(vwiEncInt(w.cncxLabelBuffer.Len())) // Label Offset //Offset relative to CNXC record
+			w.cncxLabelBuffer.Write(vwiEncInt(len(child.Title)))   // CNCXLabel lenght
 			w.cncxLabelBuffer.WriteString(child.Title)             // CNCXLabel title
-			w.cncxBuffer.Write(VwiEncInt(1))                       // Depth
-			w.cncxBuffer.Write(VwiEncInt(i))                       // Parent
+			w.cncxBuffer.Write(vwiEncInt(1))                       // Depth
+			w.cncxBuffer.Write(vwiEncInt(i))                       // Parent
 			w.chapterCount++
 			Id++
 		}
@@ -342,12 +342,12 @@ func (w *MobiWriter) generateCNCX() {
 	//			w.Cncx.WriteByte(byte(len(CNCX_ID)))                 // Len of ID
 	//			w.Cncx.WriteString(CNCX_ID)                          // ID
 	//			w.Cncx.WriteByte(ControlByte(TagxSingle)[0])         // Controll Byte
-	//			w.Cncx.Write(VwiEncInt(node.RecordOffset, true))     // Record offset
-	//			w.Cncx.Write(VwiEncInt(len(node.Html)))        // Lenght of a record
-	//			w.Cncx.Write(VwiEncInt(w.CncxLabels.Len(), true))    // Label Offset 	// Offset relative to CNXC record
-	//			w.CncxLabels.Write(VwiEncInt(len(node.Title), true)) // CNCXLabel lenght
+	//			w.Cncx.Write(vwiEncInt(node.RecordOffset, true))     // Record offset
+	//			w.Cncx.Write(vwiEncInt(len(node.Html)))        // Lenght of a record
+	//			w.Cncx.Write(vwiEncInt(w.CncxLabels.Len(), true))    // Label Offset 	// Offset relative to CNXC record
+	//			w.CncxLabels.Write(vwiEncInt(len(node.Title), true)) // CNCXLabel lenght
 	//			w.CncxLabels.WriteString(node.Title)                 // CNCXLabel title
-	//			w.Cncx.Write(VwiEncInt(0, true))                     // Depth
+	//			w.Cncx.Write(vwiEncInt(0, true))                     // Depth
 	//			w.NodeCount++
 	//		}
 	//		if node.ChildCount() > 0 {
@@ -359,14 +359,14 @@ func (w *MobiWriter) generateCNCX() {
 	//			w.Cncx.WriteByte(byte(len(CNCX_ID)))                         // Len of ID
 	//			w.Cncx.WriteString(CNCX_ID)                                  // ID
 	//			w.Cncx.WriteByte(ControlByte(TagxParent)[0])                 // Controll Byte
-	//			w.Cncx.Write(VwiEncInt(node.RecordOffset, true))             // Record offset
-	//			w.Cncx.Write(VwiEncInt(node.Len, true))                      // Lenght of a record
-	//			w.Cncx.Write(VwiEncInt(w.CncxLabels.Len(), true))            // Label Offset // Offset relative to CNXC record
-	//			w.CncxLabels.Write(VwiEncInt(len(node.Title), true))         // CNCXLabel lenght
+	//			w.Cncx.Write(vwiEncInt(node.RecordOffset, true))             // Record offset
+	//			w.Cncx.Write(vwiEncInt(node.Len, true))                      // Lenght of a record
+	//			w.Cncx.Write(vwiEncInt(w.CncxLabels.Len(), true))            // Label Offset // Offset relative to CNXC record
+	//			w.CncxLabels.Write(vwiEncInt(len(node.Title), true))         // CNCXLabel lenght
 	//			w.CncxLabels.WriteString(node.Title)                         // CNCXLabel title
-	//			w.Cncx.Write(VwiEncInt(0, true))                             // Depth
-	//			w.Cncx.Write(VwiEncInt(w.NodeCount+1, true))                 // Child1
-	//			w.Cncx.Write(VwiEncInt(w.NodeCount+node.ChildCount(), true)) // ChildN
+	//			w.Cncx.Write(vwiEncInt(0, true))                             // Depth
+	//			w.Cncx.Write(vwiEncInt(w.NodeCount+1, true))                 // Child1
+	//			w.Cncx.Write(vwiEncInt(w.NodeCount+node.ChildCount(), true)) // ChildN
 	//			w.NodeCount++
 
 	//			for _, child := range node.Children {
@@ -377,13 +377,13 @@ func (w *MobiWriter) generateCNCX() {
 	//				w.Cncx.WriteByte(byte(len(CNCX_ID)))                  // Len of ID
 	//				w.Cncx.WriteString(CNCX_ID)                           // ID
 	//				w.Cncx.WriteByte(ControlByte(TagxChild)[0])           // Controll Byte
-	//				w.Cncx.Write(VwiEncInt(child.RecordOffset, true))     // Record offset
-	//				w.Cncx.Write(VwiEncInt(child.Len, true))              // Lenght of a record
-	//				w.Cncx.Write(VwiEncInt(w.CncxLabels.Len(), true))     // Label Offset //Offset relative to CNXC record
-	//				w.CncxLabels.Write(VwiEncInt(len(child.Title), true)) // CNCXLabel lenght
+	//				w.Cncx.Write(vwiEncInt(child.RecordOffset, true))     // Record offset
+	//				w.Cncx.Write(vwiEncInt(child.Len, true))              // Lenght of a record
+	//				w.Cncx.Write(vwiEncInt(w.CncxLabels.Len(), true))     // Label Offset //Offset relative to CNXC record
+	//				w.CncxLabels.Write(vwiEncInt(len(child.Title), true)) // CNCXLabel lenght
 	//				w.CncxLabels.WriteString(child.Title)                 // CNCXLabel title
-	//				w.Cncx.Write(VwiEncInt(1, true))                      // Depth
-	//				w.Cncx.Write(VwiEncInt(child.Parent, true))           // Parent
+	//				w.Cncx.Write(vwiEncInt(1, true))                      // Depth
+	//				w.Cncx.Write(vwiEncInt(child.Parent, true))           // Parent
 	//				w.NodeCount++
 	//			}
 	//		}
@@ -391,11 +391,11 @@ func (w *MobiWriter) generateCNCX() {
 }
 
 func (w *MobiWriter) initPDF() *MobiWriter {
-	StringToBytes(UnderlineTitle(w.title), &w.Pdf.DatabaseName) // Set Database Name
+	stringToBytes(underlineTitle(w.title), &w.Pdf.DatabaseName) // Set Database Name
 	w.Pdf.CreationTime = w.timestamp                            // Set Time
 	w.Pdf.ModificationTime = w.timestamp                        // Set Time
-	StringToBytes("BOOK", &w.Pdf.Type)                          // Palm Database File Code
-	StringToBytes("MOBI", &w.Pdf.Creator)                       // *
+	stringToBytes("BOOK", &w.Pdf.Type)                          // Palm Database File Code
+	stringToBytes("MOBI", &w.Pdf.Creator)                       // *
 	w.Pdf.UniqueIDSeed = rand.New(rand.NewSource(9)).Uint32()   // UniqueID
 
 	w.Pdf.RecordsNum = w.RecordCount().UInt16()
@@ -429,7 +429,7 @@ func (w *MobiWriter) initPDH() *MobiWriter {
 }
 
 func (w *MobiWriter) initHeader() *MobiWriter {
-	StringToBytes("MOBI", &w.Header.Identifier)
+	stringToBytes("MOBI", &w.Header.Identifier)
 	w.Header.HeaderLength = 232
 	w.Header.MobiType = 2
 	w.Header.TextEncoding = 65001
@@ -474,7 +474,7 @@ func (w *MobiWriter) initHeader() *MobiWriter {
 }
 
 func (w *MobiWriter) initExth() *MobiWriter {
-	StringToBytes("EXTH", &w.Exth.Identifier)
+	stringToBytes("EXTH", &w.Exth.Identifier)
 	w.Exth.HeaderLenght = 12
 
 	for _, k := range w.Exth.Records {

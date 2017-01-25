@@ -210,7 +210,7 @@ func (w *mobiExth) GetHeaderLenght() int {
 func (e *mobiExth) Add(recType uint32, Value interface{}) *mobiExth {
 	e.RecordCount++
 
-	var MetaType = GetExthMetaByTag(recType)
+	var MetaType = getExthMetaByTag(recType)
 	var ExthRec mobiExthRecord = mobiExthRecord{RecordType: recType}
 
 	switch MetaType.Type {
