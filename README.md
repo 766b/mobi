@@ -27,6 +27,11 @@ Writer/Reader for Mobi format.
     // Add cover image
     m.AddCover("data/cover.jpg", "data/thumbnail.jpg")
 
+	// Meta data
+	m.NewExthRecord(mobi.EXTH_DOCTYPE, "EBOK")
+	m.NewExthRecord(mobi.EXTH_AUTHOR, "Book Author Name")
+	// See exth.go for additional EXTH record IDs
+
 	// Add chapters and subchapters
     ch1 := m.NewChapter("Chapter 1", []byte("Some text here"))
     ch1.AddSubChapter("Chapter 1-1", []byte("Some text here"))

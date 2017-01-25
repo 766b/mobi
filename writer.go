@@ -50,6 +50,10 @@ func (w *MobiWriter) embed(FileType EmbType, Data []byte) int {
 	return len(w.Embedded) - 1
 }
 
+func (w *MobiWriter) NewExthRecord(recType ExthType, value interface{}) {
+	w.Exth.Add(uint32(recType), value)
+}
+
 func (w *MobiWriter) AddCover(cover, thumbnail string) {
 	coverData, err := ioutil.ReadFile(cover)
 	if err != nil {
