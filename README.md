@@ -4,7 +4,7 @@ Writer/Reader for Mobi format.
 **Note:** All testing were done on `Kindle Previewer` (Windows) and `Kindle Paperwhite (6th Gen)`
 
 ## Before You Start
-- THis is more or less WIP. Use at your own risk.
+- This is more or less WIP. Use at your own risk.
 - This package was written for a specific task, thus there are certain limitations, such as:
     - `img` tags are ignored and not embedded.
     - TOC depth does not go beyond 1. Meaning for now you can only have chapters and sub-chapters. But sub-chaper can not have it's own sub-chapters.
