@@ -119,21 +119,37 @@ func (w *MobiWriter) Write() {
 	// Book Records
 	w.Pdh.TextLength = uint32(w.bookHtml.Len())
 
+	// makeRecord := func(RecN []byte) []byte {
+	// 	rLen := len(RecN)
+	// 	if rLen == 0 {
+	// 		return []byte{}
+	// 	}
+
+	// 	if rLen > MOBI_MAX_RECORD_SIZE {
+	// 		Trail := rLen - MOBI_MAX_RECORD_SIZE
+	// 		RecN = append(RecN, byte(Trail))
+	// 	} else {
+	// 		RecN = append(RecN, 0)
+	// 	}
+
+	// 	if w.compression == CompressionPalmDoc {
+	// 		RecN = palmDocLZ77Pack(RecN)
+	// 	}
+
+	// 	return RecN
+	// }
+
 	makeRecord := func(RecN []byte) []byte {
 		rLen := len(RecN)
 		if rLen == 0 {
+			//TODO: Return error?
 			return []byte{}
-		}
-
-		if rLen > MOBI_MAX_RECORD_SIZE {
-			Trail := rLen - MOBI_MAX_RECORD_SIZE
-			RecN = append(RecN, byte(Trail))
-		} else {
-			RecN = append(RecN, 0)
 		}
 
 		if w.compression == CompressionPalmDoc {
 			RecN = palmDocLZ77Pack(RecN)
+		} else {
+			RecN = append(RecN, 0)
 		}
 
 		return RecN
@@ -141,20 +157,42 @@ func (w *MobiWriter) Write() {
 
 	RecN := bytes.NewBuffer([]byte{})
 	for {
-		run, _, err := w.bookHtml.ReadRune()
+		rRune, rSize, err := w.bookHtml.ReadRune()
 		if err == io.EOF {
 			w.AddRecord(makeRecord(RecN.Bytes()))
 			RecN = bytes.NewBuffer([]byte{})
 			break
 		}
-		RecN.WriteRune(run)
 
-		if RecN.Len() >= MOBI_MAX_RECORD_SIZE {
+		//Rune length + 1 padding + record length
+		if rSize+RecN.Len()+1 > MOBI_MAX_RECORD_SIZE {
 			w.AddRecord(makeRecord(RecN.Bytes()))
+			w.bookHtml.UnreadRune()
 			RecN = bytes.NewBuffer([]byte{})
-
+			continue
 		}
+
+		RecN.WriteRune(rRune)
+
+		// if RecN.Len() >= MOBI_MAX_RECORD_SIZE {
+		// 	w.AddRecord(makeRecord(RecN.Bytes()))
+		// 	RecN = bytes.NewBuffer([]byte{})
+		// }
 	}
+	// for {
+	// 	run, _, err := w.bookHtml.ReadRune()
+	// 	if err == io.EOF {
+	// 		w.AddRecord(makeRecord(RecN.Bytes()))
+	// 		RecN = bytes.NewBuffer([]byte{})
+	// 		break
+	// 	}
+	// 	RecN.WriteRune(run)
+
+	// 	if RecN.Len() >= MOBI_MAX_RECORD_SIZE {
+	// 		w.AddRecord(makeRecord(RecN.Bytes()))
+	// 		RecN = bytes.NewBuffer([]byte{})
+	// 	}
+	// }
 	w.Pdh.RecordCount = w.RecordCount().UInt16() - 1
 
 	// Index0
@@ -218,6 +256,8 @@ func (w *MobiWriter) Write() {
 			panic(err)
 		}
 	}
+
+	w.file.Close()
 }
 
 func (w *MobiWriter) EmbeddedCount() Mint {
@@ -296,14 +336,14 @@ func (w *MobiWriter) generateCNCX() {
 			w.chapterCount++
 		} else {
 			CNCX_ID := fmt.Sprintf("%03v", w.chapterCount)
-			//			fmt.Printf("Node: %v\n", CNCX_ID)
-			w.Idxt.Offset = append(w.Idxt.Offset, uint16(MOBI_INDX_HEADER_LEN+w.cncxBuffer.Len()))
 
+			w.Idxt.Offset = append(w.Idxt.Offset, uint16(MOBI_INDX_HEADER_LEN+w.cncxBuffer.Len()))
+			// fmt.Printf("Node: %d  >  %d = %d\n", MOBI_INDX_HEADER_LEN, w.cncxBuffer.Len(), MOBI_INDX_HEADER_LEN+w.cncxBuffer.Len())
 			w.cncxBuffer.WriteByte(byte(len(CNCX_ID)))         // Len of ID
 			w.cncxBuffer.WriteString(CNCX_ID)                  // ID
 			w.cncxBuffer.WriteByte(controlByte(TagxSingle)[0]) // Controll Byte
 			w.cncxBuffer.Write(vwiEncInt(node.RecordOffset))   // Record offset
-			fmt.Printf("Offset: %v", node.RecordOffset)
+			fmt.Printf("Offset: %v\n", node.RecordOffset)
 			w.cncxBuffer.Write(vwiEncInt(node.Len))                // Lenght of a record
 			w.cncxBuffer.Write(vwiEncInt(w.cncxLabelBuffer.Len())) // Label Offset 	// Offset relative to CNXC record
 			w.cncxLabelBuffer.Write(vwiEncInt(len(node.Title)))    // CNCXLabel lenght
